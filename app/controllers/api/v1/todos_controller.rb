@@ -1,12 +1,9 @@
 class API::V1::TodosController < ApplicationController
+  before_filter :load_todo, only: [:update, :destroy]
 
   def index
-    @todo = Todo.all
-    render json: @todo
-  end
-
-  def show
-    @todo = Todo.find(params[:id])
+    @todos = Todo.all
+    render json: @todos
   end
 
   def create
@@ -16,17 +13,20 @@ class API::V1::TodosController < ApplicationController
   end
 
   def update
-    @todo = Todo.find(params[:id])
     @todo.update(todo_params)
   end
 
   def destroy
-    @todo = Todo.find_by(params[:id])
     @todo.destroy
+    render json: @todo, status: :no_content
   end
 
 
   private
+
+  def load_todo
+    @todo = Todo.find(params[:id])
+  end
 
   def todo_params
     params.permit(:title, :completed, :order)
